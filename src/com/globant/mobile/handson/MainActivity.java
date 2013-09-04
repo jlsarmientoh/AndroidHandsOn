@@ -1,6 +1,5 @@
 package com.globant.mobile.handson;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,7 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 
 	public final static String 	EXTRA_MESSAGE = "com.globant.mobile.handson.MESSAGE";
 	
@@ -16,6 +15,8 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		// Show the Up button in the action bar.
+		setupActionBar();
 	}
 
 	@Override
