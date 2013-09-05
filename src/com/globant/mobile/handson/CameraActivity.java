@@ -1,16 +1,18 @@
 package com.globant.mobile.handson;
 
-import com.globant.mobile.handson.util.SystemUiHider;
-
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import com.globant.mobile.handson.media.CustomCamera;
+import com.globant.mobile.handson.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -46,6 +48,8 @@ public class CameraActivity extends BaseActivity {
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
 	private SystemUiHider mSystemUiHider;
+	
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +58,11 @@ public class CameraActivity extends BaseActivity {
 		setContentView(R.layout.activity_camera);
 		setupActionBar();
 
-		final View controlsView = findViewById(R.id.fullscreen_content_controls);
-		final View contentView = findViewById(R.id.fullscreen_content);
+		final LinearLayout controlsView = (LinearLayout)findViewById(R.id.fullscreen_content_controls);
+		final FrameLayout contentView = (FrameLayout)findViewById(R.id.camera_preview);
+		
+		mPreview = new CustomCamera(this);
+		contentView.addView(mPreview);
 
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
@@ -117,7 +124,7 @@ public class CameraActivity extends BaseActivity {
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
-		findViewById(R.id.dummy_button).setOnTouchListener(
+		findViewById(R.id.button_capture).setOnTouchListener(
 				mDelayHideTouchListener);
 	}
 
@@ -148,6 +155,10 @@ public class CameraActivity extends BaseActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void takePicture(View view){
+		mPreview.takePicture();
 	}
 
 	/**
@@ -181,4 +192,9 @@ public class CameraActivity extends BaseActivity {
 		mHideHandler.removeCallbacks(mHideRunnable);
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
 	}
+	
+	/**
+	 * Camera preview Object
+	 */
+	private CustomCamera mPreview;
 }
