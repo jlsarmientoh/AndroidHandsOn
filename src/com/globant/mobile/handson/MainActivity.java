@@ -78,6 +78,11 @@ public class MainActivity extends BaseActivity {
 		startActivity(intent);
 	}
 	
+	public void dispatchTakePictureInternal(View view){
+		Intent intent = new Intent(this, CameraActivity.class);
+		startActivity(intent);
+	}
+	
 	public void dispatchTakePictureExternal(View view){
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);		
 		try{

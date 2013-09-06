@@ -35,5 +35,11 @@
         android:layout_height="wrap_content"
         android:onClick="dispatchTakePictureExternal"
         android:text="@string/button_camera" />
+    
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="dispatchTakePictureInternal"
+        android:text="@string/button_camera_internal" />
 
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.globant.mobile.handson.media.CustomCamera;
 import com.globant.mobile.handson.util.SystemUiHider;
@@ -48,6 +49,10 @@ public class CameraActivity extends BaseActivity {
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
 	private SystemUiHider mSystemUiHider;
+	/**
+	 * Camera preview Object
+	 */
+	private CustomCamera mPreview;
 	
 	
 
@@ -60,9 +65,12 @@ public class CameraActivity extends BaseActivity {
 
 		final LinearLayout controlsView = (LinearLayout)findViewById(R.id.fullscreen_content_controls);
 		final FrameLayout contentView = (FrameLayout)findViewById(R.id.camera_preview);
-		
-		mPreview = new CustomCamera(this);
-		contentView.addView(mPreview);
+		try{
+			mPreview = new CustomCamera(this);
+			contentView.addView(mPreview);
+		} catch(Exception e){
+			Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+		}
 
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
@@ -157,6 +165,11 @@ public class CameraActivity extends BaseActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public void onPause(){
+		mPreview.releaseCamera();
+	}
+	
 	public void takePicture(View view){
 		mPreview.takePicture();
 	}
@@ -193,8 +206,5 @@ public class CameraActivity extends BaseActivity {
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
 	}
 	
-	/**
-	 * Camera preview Object
-	 */
-	private CustomCamera mPreview;
+	
 }

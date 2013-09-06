@@ -33,7 +33,7 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 	private static final int MEDIA_TYPE_VIDEO = 2;
 	private static final String ALBUM_NAME = "HandsOn";
 
-	public CustomCamera(Context context) {
+	public CustomCamera(Context context) throws Exception {
 		super(context);		
 		
 		if(checkCameraHardware(context)){
@@ -42,6 +42,7 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 				
 			} catch(CameraNotAvailableException cnae){
 				Log.d("HandsOn", "Error getting Camera: " + cnae.getMessage());
+				throw new Exception(cnae);
 			}
 		}				
 		/**
@@ -125,7 +126,10 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 	}
 	
 	public void releaseCamera(){
-		mCamera.release();
+		if(mCamera != null){
+			mCamera.release();
+			mCamera = null;
+		}
 	}
 	
 	public void takePicture(){

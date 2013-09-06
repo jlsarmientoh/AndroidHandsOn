@@ -7,6 +7,7 @@
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
     <string name="button_camera">Take a picture</string>
+    <string name="button_camera_internal">Take a picture with own camera</string>
     <string name="title_activity_main">Android Hands On</string>
     <string name="title_activity_display_message">Displaying the message</string>
     <string name="hello">Default Hello!</string>

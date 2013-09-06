@@ -57,14 +57,15 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
         public static final int button_camera=0x7f060005;
-        public static final int button_capture=0x7f06000a;
+        public static final int button_camera_internal=0x7f060006;
+        public static final int button_capture=0x7f06000b;
         public static final int button_send=0x7f060004;
-        public static final int dummy_content=0x7f06000b;
+        public static final int dummy_content=0x7f06000c;
         public static final int edit_message=0x7f060003;
-        public static final int hello=0x7f060008;
-        public static final int title_activity_camera=0x7f060009;
-        public static final int title_activity_display_message=0x7f060007;
-        public static final int title_activity_main=0x7f060006;
+        public static final int hello=0x7f060009;
+        public static final int title_activity_camera=0x7f06000a;
+        public static final int title_activity_display_message=0x7f060008;
+        public static final int title_activity_main=0x7f060007;
     }
     public static final class style {
         /** 
