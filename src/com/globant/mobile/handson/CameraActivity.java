@@ -168,11 +168,19 @@ public class CameraActivity extends BaseActivity {
 	
 	@Override
 	public void onPause(){
+		super.onPause();
 		mPreview.releaseCamera();
 	}
 	
 	@Override
 	public void onStop(){
+		super.onStop();
+		mPreview.releaseCamera();
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
 		mPreview.releaseCamera();
 	}
 	
