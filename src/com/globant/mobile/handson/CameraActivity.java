@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.globant.mobile.handson.exception.CameraNotAvailableException;
 import com.globant.mobile.handson.media.CustomCamera;
 import com.globant.mobile.handson.util.SystemUiHider;
 
@@ -168,6 +169,35 @@ public class CameraActivity extends BaseActivity {
 	@Override
 	public void onPause(){
 		mPreview.releaseCamera();
+	}
+	
+	@Override
+	public void onStop(){
+		mPreview.releaseCamera();
+	}
+	
+	@Override
+	public void onRestart(){
+		super.onRestart();
+		
+		try {
+			mPreview.initCameraInstance();
+		} catch (CameraNotAvailableException e) {			
+			e.printStackTrace();
+			Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		
+		try {
+			mPreview.initCameraInstance();
+		} catch (CameraNotAvailableException e) {			
+			e.printStackTrace();
+			Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+		}
 	}
 	
 	public void takePicture(View view){

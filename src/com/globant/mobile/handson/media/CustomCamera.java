@@ -75,9 +75,10 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 	 * Intantiates the camera
 	 * @throws CameraNotAvailableException
 	 */
-	private void initCameraInstance() throws CameraNotAvailableException{
-		mCamera = null;
+	public void initCameraInstance() throws CameraNotAvailableException{		
+		
 		try{
+			if(mCamera == null)
 			mCamera = Camera.open();
 		} catch(Exception e){
 			throw new CameraNotAvailableException("Camera is not available (in use or does not exist)");
@@ -122,7 +123,7 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		//The camera is released in the activity or not?
+		releaseCamera();
 	}
 	
 	public void releaseCamera(){
