@@ -8,11 +8,17 @@
     <string name="button_send">Send</string>
     <string name="button_camera">Take a picture</string>
     <string name="button_camera_internal">Take a picture with own camera</string>
+    <string name="button_gallery">View gallery</string>
     <string name="title_activity_main">Android Hands On</string>
     <string name="title_activity_display_message">Displaying the message</string>
     <string name="hello">Default Hello!</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="button_capture">Capture</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="imageview_description">Image Thumbnail</string>
+    <string name="title_activity_image_detail">ImageDetailActivity</string>
 
 </resources>

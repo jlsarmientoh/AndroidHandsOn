@@ -66,6 +66,10 @@ public class MainActivity extends BaseActivity {
 		}
 	}
 	
+	/**
+	 * Opens the Display Message activity
+	 * @param view
+	 */
 	public void sendMessage(View view){
 		String message = null;
 		
@@ -76,13 +80,19 @@ public class MainActivity extends BaseActivity {
 		intent.putExtra(EXTRA_MESSAGE, message);
 		
 		startActivity(intent);
-	}
-	
+	}	
+	/**
+	 * Opens the Custom Camera activity 
+	 * @param view
+	 */
 	public void dispatchTakePictureInternal(View view){
 		Intent intent = new Intent(this, CameraActivity.class);
 		startActivity(intent);
 	}
-	
+	/**
+	 * Opens the featured camera activity (External Activity)
+	 * @param view
+	 */
 	public void dispatchTakePictureExternal(View view){
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);		
 		try{
@@ -91,6 +101,14 @@ public class MainActivity extends BaseActivity {
 		} catch(IOException ioex){
 			Toast.makeText(this, "Error: " + ioex.getMessage(), Toast.LENGTH_LONG).show();
 		}
+	}
+	/**
+	 * Opens the Gallery activity
+	 * @param view
+	 */
+	public void dispatchGallery(View view){
+		Intent intent = new Intent(this, GalleryActivity.class);
+		startActivity(intent);
 	}
 	/**
 	 * Creates the file for the taken image
