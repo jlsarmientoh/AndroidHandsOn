@@ -35,10 +35,10 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (BuildConfig.DEBUG) {
-        	enableStrictMode();
+        	//enableStrictMode();
         }
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.image_detail_pager);
+        setContentView(R.layout.activity_image_detail);
 
         // Fetch screen height and width, to use as our max size when loading images as this
         // activity runs full screen
@@ -193,7 +193,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         }
     }
     
-    @TargetApi(11)
+    /*@TargetApi(11)
     public static void enableStrictMode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             StrictMode.ThreadPolicy.Builder threadPolicyBuilder =
@@ -214,6 +214,6 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
             StrictMode.setThreadPolicy(threadPolicyBuilder.build());
             StrictMode.setVmPolicy(vmPolicyBuilder.build());
         }
-    }
+    }*/
 
 }
