@@ -1,12 +1,19 @@
 package com.globant.mobile.handson;
 
+import java.io.File;
+import java.io.IOException;
+
+import com.globant.mobile.handson.provider.Bitmaps;
+
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,6 +21,8 @@ import android.view.MenuItem;
 public class GalleryActivity extends FragmentActivity {
 	
 	private static final String TAG = "GalleryActivity";
+	private static final String ALBUM_NAME = "HandsOn";
+	private File storageDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +30,15 @@ public class GalleryActivity extends FragmentActivity {
             enableStrictMode();
         }
         super.onCreate(savedInstanceState);
+        
+        try {
+			initStorageDir();
+		} catch (IOException e) {
+			if (BuildConfig.DEBUG) {
+                Log.d(TAG, "External storage not initialized");
+            }
+			e.printStackTrace();
+		}
 
         if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
             final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -76,4 +94,33 @@ public class GalleryActivity extends FragmentActivity {
             StrictMode.setVmPolicy(vmPolicyBuilder.build());
         }
     }
+	
+	private void initStorageDir() throws IOException{		
+		String state = Environment.getExternalStorageState();
+		storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ALBUM_NAME);
+		//Checks if the external storage is mounted
+		if(Environment.MEDIA_MOUNTED.equals(state)){
+			if(!storageDir.exists()){
+				if(!storageDir.mkdirs()){
+					Log.d("HandsOn", "Failed to create directory");
+				}
+			} else{
+				File[] files = storageDir.listFiles();
+				if(files != null){
+					Bitmaps.imageUrls = new String[files.length];
+					Bitmaps.imageThumbUrls = new String[files.length];
+					for(int i = 0; i < files.length; i++){
+						Bitmaps.imageUrls[i] = files[i].getAbsolutePath();
+						Bitmaps.imageThumbUrls[i] = files[i].getAbsolutePath();
+					}
+				}
+			}
+		}else if(Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
+			//External storage mounted but read only, can't write on it
+			throw new IOException("External memory in READ ONLY mode");
+		}else{
+			//External storage not available/mounted/etc
+			throw new IOException("External memory not available");
+		}
+	}
 }

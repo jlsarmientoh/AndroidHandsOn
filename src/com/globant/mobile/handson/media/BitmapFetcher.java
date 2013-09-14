@@ -9,12 +9,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.R;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,6 +38,7 @@ public class BitmapFetcher extends BitmapDecoder {
     private boolean mBitmapDiskCacheStarting = true;
     private final Object mBitmapDiskCacheLock = new Object();
     private static final int DISK_CACHE_INDEX = 0;
+    
 
     /**
      * Initialize providing a target image width and height for the processing images.
@@ -59,7 +64,7 @@ public class BitmapFetcher extends BitmapDecoder {
     }
 
     private void init(Context context) {
-        checkConnection(context);
+        checkConnection(context);        
         mBitmapCacheDir = BitmapCache.getDiskCacheDir(context, BITMAP_CACHE_DIR);
     }
 
@@ -78,7 +83,7 @@ public class BitmapFetcher extends BitmapDecoder {
                 try {
                     mBitmapDiskCache = DiskLruCache.open(mBitmapCacheDir, 1, 1, BITMAP_CACHE_SIZE);
                     if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "HTTP cache initialized");
+                        Log.d(TAG, "Disk cache initialized");
                     }
                 } catch (IOException e) {
                     mBitmapDiskCache = null;
@@ -252,9 +257,9 @@ public class BitmapFetcher extends BitmapDecoder {
         BufferedInputStream in = null;
 
         try {
-            final URL url = new URL(urlString);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
+            final File file = new File(urlString);           
+            
+            in = new BufferedInputStream(new FileInputStream(file), IO_BUFFER_SIZE);
             out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
 
             int b;

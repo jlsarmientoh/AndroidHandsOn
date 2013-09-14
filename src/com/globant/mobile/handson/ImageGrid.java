@@ -22,11 +22,10 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.globant.mobile.handson.media.BitmapCache.ImageCacheParams;
 import com.globant.mobile.handson.media.BitmapFetcher;
-import com.globant.mobile.handson.provider.Images;
+import com.globant.mobile.handson.provider.Bitmaps;
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass. Activities that
@@ -205,13 +204,13 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
         @Override
         public int getCount() {
             // Size + number of columns for top empty row
-            return Images.imageThumbUrls.length + mNumColumns;
+            return Bitmaps.imageThumbUrls.length + mNumColumns;
         }
 
         @Override
         public Object getItem(int position) {
             return position < mNumColumns ?
-                    null : Images.imageThumbUrls[position - mNumColumns];
+                    null : Bitmaps.imageThumbUrls[position - mNumColumns];
         }
 
         @Override
@@ -265,7 +264,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 
             // Finally load the image asynchronously into the ImageView, this also takes care of
             // setting a placeholder image while the background thread runs
-            mImageFetcher.loadImage(Images.imageThumbUrls[position - mNumColumns], imageView);
+            mImageFetcher.loadImage(Bitmaps.imageThumbUrls[position - mNumColumns], imageView);
             return imageView;
         }
 

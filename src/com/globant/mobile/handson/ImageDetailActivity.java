@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -17,9 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
-import android.widget.Toast;
+
 import com.globant.mobile.handson.media.BitmapCache;
 import com.globant.mobile.handson.media.BitmapFetcher;
+import com.globant.mobile.handson.provider.Bitmaps;
 import com.globant.mobile.handson.provider.Images;
 
 public class ImageDetailActivity extends FragmentActivity implements OnClickListener{
@@ -174,7 +174,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 
         @Override
         public Fragment getItem(int position) {
-            return ImageDetailFragment.newInstance(Images.imageUrls[position]);
+            return ImageDetailFragment.newInstance(Bitmaps.imageUrls[position]);
         }
     }
 
