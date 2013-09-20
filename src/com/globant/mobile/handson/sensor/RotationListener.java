@@ -14,7 +14,7 @@ public class RotationListener implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent evt) {
-		// TODO Auto-generated method stub
+		final float values[] = evt.values;
 	}
 
 }

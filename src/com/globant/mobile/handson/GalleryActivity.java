@@ -30,15 +30,6 @@ public class GalleryActivity extends FragmentActivity {
             enableStrictMode();
         }
         super.onCreate(savedInstanceState);
-        
-        try {
-			initStorageDir();
-		} catch (IOException e) {
-			if (BuildConfig.DEBUG) {
-                Log.d(TAG, "External storage not initialized");
-            }
-			e.printStackTrace();
-		}
 
         if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
             final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -121,6 +112,19 @@ public class GalleryActivity extends FragmentActivity {
 		}else{
 			//External storage not available/mounted/etc
 			throw new IOException("External memory not available");
+		}
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		try {
+			initStorageDir();
+		} catch (IOException e) {
+			if (BuildConfig.DEBUG) {
+                Log.d(TAG, "External storage not initialized");
+            }
+			e.printStackTrace();
 		}
 	}
 }

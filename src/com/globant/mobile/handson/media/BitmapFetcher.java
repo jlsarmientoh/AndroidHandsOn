@@ -8,19 +8,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import android.R;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PointF;
+import android.media.FaceDetector;
+import android.media.FaceDetector.Face;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.globant.mobile.handson.BuildConfig;
 import com.globant.mobile.handson.util.DiskLruCache;
@@ -231,6 +231,45 @@ public class BitmapFetcher extends BitmapDecoder {
         if (fileDescriptor != null) {
             bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor, mImageWidth,
                     mImageHeight, getImageCache());
+            //Face Detection
+            /*int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            
+            FaceDetector detector = new FaceDetector(width, height, 5);
+            Face[] faces = new Face[5];
+            
+            Bitmap bitmap565 = Bitmap.createBitmap(width, height, Config.RGB_565);
+            Paint ditherPaint = new Paint();
+            Paint drawPaint = new Paint();
+            
+            ditherPaint.setDither(true);
+            drawPaint.setColor(Color.YELLOW);
+            drawPaint.setStyle(Paint.Style.STROKE);
+            drawPaint.setStrokeWidth(2);
+            
+            Canvas canvas = new Canvas();
+            canvas.setBitmap(bitmap565);
+            canvas.drawBitmap(bitmap, 0, 0, ditherPaint);
+            
+            int facesFound = detector.findFaces(bitmap565, faces);
+            PointF midPoint = new PointF();
+            float eyeDistance = 0.0f;
+            float confidence = 0.0f;
+            
+            if(facesFound > 0){
+            	for(int i = 0; i < facesFound; i++){
+            		faces[i].getMidPoint(midPoint);
+            		eyeDistance = faces[i].eyesDistance();
+            		confidence = faces[i].confidence();
+            		
+            		canvas.drawRect((int)midPoint.x - eyeDistance, 
+            				(int)midPoint.y - eyeDistance,
+            				(int)midPoint.x + eyeDistance,
+            				(int)midPoint.y + eyeDistance, drawPaint);
+            	}
+            	
+            	bitmap = bitmap565;
+            }*/
         }
         if (fileInputStream != null) {
             try {
