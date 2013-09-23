@@ -110,6 +110,8 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     @Override
     public void onResume() {
         super.onResume();
+        mAdapter.setSize(Bitmaps.imageUrls.length);
+        mAdapter.notifyDataSetChanged();
         mImageFetcher.setExitTasksEarly(false);
     }
 
@@ -160,11 +162,11 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
      * memory at once but create/destroy them on the fly.
      */
     private class ImagePagerAdapter extends FragmentStatePagerAdapter {
-        private final int mSize;
+        private int mSize;
 
         public ImagePagerAdapter(FragmentManager fm, int size) {
             super(fm);
-            mSize = size;
+            mSize = size;            
         }
 
         @Override
@@ -175,6 +177,10 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         @Override
         public Fragment getItem(int position) {
             return ImageDetailFragment.newInstance(Bitmaps.imageUrls[position]);
+        }
+        
+        public void setSize(int size){
+        	mSize = size;
         }
     }
 
