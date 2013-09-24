@@ -30,22 +30,39 @@
             android:text="@string/button_send" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_camera"
+        />
+    
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="dispatchTakePictureExternal"
-        android:text="@string/button_camera" />
+        android:onClick="dispatchTakePictureExternal"         
+        android:background="@drawable/blue_camera_icon"/>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_camera_internal"
+        />
     
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="dispatchTakePictureInternal"
-        android:text="@string/button_camera_internal" />
+        android:background="@drawable/blue_camera_icon" />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_gallery" />
     
     <Button 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="dispatchGallery"
-        android:text="@string/button_gallery"/>
+        android:background="@drawable/gallery_icon"/>
 
 </LinearLayout>
