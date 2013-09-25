@@ -311,46 +311,7 @@ public abstract class BitmapWorker {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "onPostExecute - setting bitmap");
                 }
-                //Face Detection
-                /*int width = value.getBitmap().getWidth();
-                int height = value.getBitmap().getHeight();
                 
-                FaceDetector detector = new FaceDetector(width, height, 5);
-                Face[] faces = new Face[5];
-                
-                Bitmap bitmap565 = Bitmap.createBitmap(width, height, Config.RGB_565);
-                Paint ditherPaint = new Paint();
-                Paint drawPaint = new Paint();
-                
-                ditherPaint.setDither(true);
-                drawPaint.setColor(Color.YELLOW);
-                drawPaint.setStyle(Paint.Style.STROKE);
-                drawPaint.setStrokeWidth(2);
-                
-                Canvas canvas = new Canvas();
-                canvas.setBitmap(bitmap565);
-                canvas.drawBitmap(value.getBitmap(), 0, 0, ditherPaint);
-                
-                int facesFound = detector.findFaces(bitmap565, faces);
-                PointF midPoint = new PointF();
-                float eyeDistance = 0.0f;
-                float confidence = 0.0f;
-                
-                if(facesFound > 0){
-                	for(int i = 0; i < facesFound; i++){
-                		faces[i].getMidPoint(midPoint);
-                		eyeDistance = faces[i].eyesDistance();
-                		confidence = faces[i].confidence();
-                		
-                		canvas.drawRect((int)midPoint.x - eyeDistance, 
-                				(int)midPoint.y - eyeDistance,
-                				(int)midPoint.x + eyeDistance,
-                				(int)midPoint.y + eyeDistance, drawPaint);
-                	}
-                	
-                	//Replace the preview bitmap with the marked faces bitmap
-                	value = new BitmapDrawable(mResources, bitmap565);
-                }*/
                 setImageDrawable(imageView, value);
             }
         }
