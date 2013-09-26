@@ -14,10 +14,9 @@
     <string name="hello">Default Hello!</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="button_capture">Capture</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_gallery">GalleryActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="button_discard">Descartar</string>    
+    <string name="button_ok">OK</string>
+    <string name="title_activity_gallery">GalleryActivity</string>    
     <string name="imageview_description">Image Thumbnail</string>
     <string name="title_activity_image_detail">ImageDetailActivity</string>
 

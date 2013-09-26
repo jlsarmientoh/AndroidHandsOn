@@ -11,7 +11,11 @@
     <string name="title_activity_main">Android manos a la obra</string>
     <string name="title_activity_display_message">Muestra el mensaje</string>
     <string name="hello">Default Hola!</string>
-    <string name="button_capture">Capturar</string>
+    <string name="button_capture">Capturar</string>    
+    <string name="button_discard">Descartar</string>
+    <string name="button_ok">Aceptar</string>
+    <string name="title_activity_gallery">Galería</string>    
     <string name="imageview_description">Miniatura</string>
+    <string name="title_activity_image_detail">Detalle</string>
     
 </resources>

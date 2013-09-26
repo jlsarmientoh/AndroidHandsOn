@@ -9,60 +9,72 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"        
-        android:orientation="horizontal" >
-
-        <EditText
-            android:id="@+id/edit_message"
-            android:layout_width="0dp"
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/edit_message" >
-
-        </EditText>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="sendMessage"
-            android:text="@string/button_send" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_camera"
-        />
-    
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="dispatchTakePictureExternal"         
-        android:background="@drawable/blue_camera_icon"/>
-    
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_camera_internal"
-        />
-    
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="dispatchTakePictureInternal"
-        android:background="@drawable/blue_camera_icon" />
-    
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_gallery" />
-    
-    <Button 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="dispatchGallery"
-        android:background="@drawable/gallery_icon"/>
+            android:orientation="vertical">
+            
+		    <LinearLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"        
+		        android:orientation="horizontal" >
+		
+		        <EditText
+		            android:id="@+id/edit_message"
+		            android:layout_width="0dp"
+		            android:layout_height="wrap_content"
+		            android:layout_weight="1"
+		            android:hint="@string/edit_message" >
+		
+		        </EditText>
+		
+		        <Button
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:onClick="sendMessage"
+		            android:text="@string/button_send" />
+		    </LinearLayout>
+		
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/button_camera"
+		        />
+		    
+		    <Button
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="dispatchTakePictureExternal"         
+		        android:background="@drawable/blue_camera_icon"/>
+		    
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/button_camera_internal"
+		        />
+		    
+		    <Button
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="dispatchTakePictureInternal"
+		        android:background="@drawable/blue_camera_icon" />
+		    
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/button_gallery" />
+		    
+		    <Button 
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="dispatchGallery"
+		        android:background="@drawable/gallery_icon"/>
+	    
+	    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

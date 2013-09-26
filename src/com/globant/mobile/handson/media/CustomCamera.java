@@ -8,10 +8,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -26,6 +28,7 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 	private SurfaceHolder mHolder;
 	private Camera mCamera;		
 	private File storageDir;
+	private String lastPictureTaken;
 	/**
 	 * Static attributes
 	 */
@@ -75,11 +78,16 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 	 * Intantiates the camera
 	 * @throws CameraNotAvailableException
 	 */
+	@SuppressLint("NewApi")
 	public void initCameraInstance() throws CameraNotAvailableException{		
 		
 		try{
 			if(mCamera == null)
 			mCamera = Camera.open();
+			
+			if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1) {
+				mCamera.enableShutterSound(true);
+			}
 		} catch(Exception e){
 			throw new CameraNotAvailableException("Camera is not available (in use or does not exist)");
 		}		
@@ -137,6 +145,22 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 		mCamera.takePicture(null, null, mPicture);
 	}
 	
+	public void resumePreview(){
+		try{
+			mCamera.setPreviewDisplay(getHolder());
+			mCamera.startPreview();
+		}catch(IOException e){
+			Log.d("HandsOn", "Error setting Camera preview: " + e.getMessage());
+		}
+	}
+	
+	public void deleteLastPictureTaken(){
+		if(lastPictureTaken != null && !lastPictureTaken.isEmpty()){
+			File fileToDelete = new File(lastPictureTaken);
+			fileToDelete.delete();
+		}
+	}
+	
 	/**
 	 * Creates the file for the taken image
 	 * @return Image File for storage
@@ -167,6 +191,8 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 		
 		return image;
 	}
+	
+	
 	
 	private void initStorageDir() throws IOException{		
 		String state = Environment.getExternalStorageState();
@@ -203,6 +229,7 @@ public class CustomCamera extends SurfaceView implements SurfaceHolder.Callback{
 				FileOutputStream fos = new FileOutputStream(pictureFile);
 				fos.write(data);
 				fos.close();
+				lastPictureTaken = pictureFile.getAbsolutePath();
 			} catch(FileNotFoundException e){
 				Log.d("HandsOn", "File not found: " + e.getMessage());
 			} catch(Exception e){

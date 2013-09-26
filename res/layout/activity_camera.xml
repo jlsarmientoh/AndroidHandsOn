@@ -40,6 +40,16 @@
             tools:ignore="UselessParent" >
 
             <Button
+                android:id="@+id/button_discard"
+                style="?buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:text="@string/button_discard"
+                android:onClick="discardPicture" />
+
+            <Button
                 android:id="@+id/button_capture"
                 style="?buttonBarButtonStyle"
                 android:layout_width="0dp"
@@ -47,6 +57,17 @@
                 android:layout_weight="1"
                 android:text="@string/button_capture"
                 android:onClick="takePicture" />
+
+            <Button
+                android:id="@+id/button_ok"
+                style="?buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:text="@string/button_ok"
+                android:onClick="resumePreview" />
+
         </LinearLayout>
 
     </FrameLayout>

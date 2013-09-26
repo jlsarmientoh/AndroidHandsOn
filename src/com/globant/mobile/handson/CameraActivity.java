@@ -8,6 +8,7 @@ import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -54,6 +55,9 @@ public class CameraActivity extends BaseActivity {
 	 * Camera preview Object
 	 */
 	private CustomCamera mPreview;
+	private Button mDiscardButton;
+	private Button mResumeButton;
+	private Button mCaptureButton;
 	
 	
 
@@ -72,6 +76,10 @@ public class CameraActivity extends BaseActivity {
 		} catch(Exception e){
 			Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
 		}
+		
+		mDiscardButton = (Button)findViewById(R.id.button_discard);
+		mResumeButton = (Button)findViewById(R.id.button_ok);
+		mCaptureButton = (Button)findViewById(R.id.button_capture);
 
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
@@ -210,7 +218,29 @@ public class CameraActivity extends BaseActivity {
 	
 	public void takePicture(View view){
 		mPreview.takePicture();
+		
+		mCaptureButton.setVisibility(View.GONE);
+		mDiscardButton.setVisibility(View.VISIBLE);
+		mResumeButton.setVisibility(View.VISIBLE);		
 	}
+	
+	public void discardPicture(View view){
+		mPreview.deleteLastPictureTaken();
+		mPreview.resumePreview();
+		
+		mCaptureButton.setVisibility(View.VISIBLE);
+		mDiscardButton.setVisibility(View.GONE);
+		mResumeButton.setVisibility(View.GONE);
+	}
+	
+	public void resumePreview(View view){
+		mPreview.resumePreview();
+		
+		mCaptureButton.setVisibility(View.VISIBLE);
+		mDiscardButton.setVisibility(View.GONE);
+		mResumeButton.setVisibility(View.GONE);
+	}
+	
 
 	/**
 	 * Touch listener to use for in-layout UI controls to delay hiding the
