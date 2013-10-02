@@ -215,6 +215,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 					switch(item.getItemId()){
 					case R.id.action_delete:{
 						deleteBitmap(index);
+						mode.finish(); // Action picked, so close the CAB
 						return true;
 						}
 					default:
