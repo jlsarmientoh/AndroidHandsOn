@@ -1,5 +1,9 @@
 package com.globant.mobile.handson;
 
+import java.io.File;
+import java.util.zip.Inflater;
+
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -9,6 +13,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +26,11 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.globant.mobile.handson.media.BitmapCache.ImageCacheParams;
 import com.globant.mobile.handson.media.BitmapFetcher;
@@ -35,7 +44,7 @@ import com.globant.mobile.handson.provider.Bitmaps;
  * create an instance of this fragment.
  * 
  */
-public class ImageGrid extends Fragment implements AdapterView.OnItemClickListener{
+public class ImageGrid extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 	 private static final String TAG = "ImageGridFragment";
 	 private static final String IMAGE_CACHE_DIR = "thumbs";
 
@@ -43,6 +52,8 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 	 private int mImageThumbSpacing;
 	 private ImageAdapter mAdapter;
 	 private BitmapFetcher mImageFetcher;
+	 private Inflater mInflater;
+	 private ActionMode mActionMode;
 
 	
     public ImageGrid() {}
@@ -73,8 +84,8 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 
         final View v = inflater.inflate(R.layout.fragment_image_grid, container, false);
         final GridView mGridView = (GridView) v.findViewById(R.id.gridView);
-        mGridView.setAdapter(mAdapter);
-        mGridView.setOnItemClickListener(this);
+        mGridView.setAdapter(mAdapter);        
+        mGridView.setOnItemLongClickListener(this);
         mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
@@ -91,7 +102,12 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
                     int visibleItemCount, int totalItemCount) {
             }
         });
-
+        //Setting the Context Menu for the GridVew id API level is lower than Honeycomb
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
+        	registerForContextMenu(mGridView);
+        }else{
+        	mGridView.setOnItemClickListener(this);
+        }
         // This listener is used to get the final width of the GridView and then calculate the
         // number of columns and the width of each column. The width of each column is variable
         // as the GridView has stretchMode=columnWidth. The column width is used to set the height
@@ -119,9 +135,14 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
         return v;
     }
 
-    @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@Override
     public void onResume() {
         super.onResume();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+        	final GridView mGridView = (GridView) this.getActivity().findViewById(R.id.gridView);
+        	mGridView.clearChoices();
+        }
         mImageFetcher.setExitTasksEarly(false);
         mAdapter.notifyDataSetChanged();
     }
@@ -156,25 +177,105 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
             startActivity(i);
         }
     }
+    
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @Override
+	public boolean onItemLongClick(AdapterView<?> parent, View v, int position,
+			long id) {
+    	//Setting the Context Action Bar if API Level is Honeycomb and higher
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+        	if(mActionMode != null){
+        		return false;
+        	}
+        	
+        	final int index = position;
+        	ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+				
+				@Override
+				public boolean onPrepareActionMode(ActionMode mode, Menu menu) {					
+					return false;
+				}
+				
+				@Override
+				public void onDestroyActionMode(ActionMode mode) {
+					mActionMode = null;
+					
+				}
+				
+				@Override
+				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+					// Inflate a menu resource providing context menu items
+			        MenuInflater inflater = mode.getMenuInflater();
+			        inflater.inflate(R.menu.image_context_bar, menu);
+			        return true;
+				}
+				
+				@Override
+				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+					switch(item.getItemId()){
+					case R.id.action_delete:{
+						deleteBitmap(index);
+						return true;
+						}
+					default:
+						return false;
+					}
+				}
+			};
+        	
+        	mActionMode = this.getActivity().startActionMode(mActionModeCallback);
+        	v.setSelected(true);
+        	v.setPressed(true);
+        	return true;
+        }else{
+        	return false;
+        }
+	}
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
     }
-
+    
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        /*switch (item.getItemId()) {
-            case R.id.clear_cache:
-                mImageFetcher.clearCache();
-                Toast.makeText(getActivity(), R.string.clear_cache_complete_toast,
-                        Toast.LENGTH_SHORT).show();
-                return true;
-        }*/
-        return super.onOptionsItemSelected(item);
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo){
+    	super.onCreateContextMenu(menu, view, menuInfo);
+    	
+    	MenuInflater inflater = this.getActivity().getMenuInflater();
+    	inflater.inflate(R.menu.image_context_bar, menu);
     }
 
-    /**
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {        
+        return super.onOptionsItemSelected(item);
+    }
+    
+	@Override
+    public boolean onContextItemSelected(MenuItem item){
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    	
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                deleteBitmap(info.position);            	
+                return true;
+            case R.id.action_share:                
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    private void deleteBitmap(int position) {
+    	final GridView mGridView = (GridView)this.getActivity().findViewById(R.id.gridView);
+    	String bitmapPath = (String)mGridView.getAdapter().getItem(position);    	
+    	File fileToDelete = new File(bitmapPath);
+    	if(fileToDelete.exists()){
+    		fileToDelete.delete();
+    		mAdapter.notifyDataSetChanged();
+    	}
+	}
+	/**
      * The main adapter that backs the GridView. This is fairly standard except the number of
      * columns in the GridView is used to create a fake top row of empty views as we use a
      * transparent ActionBar and don't want the real top row of images to start off covered by it.
@@ -293,4 +394,5 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
             return mNumColumns;
         }
     }
+	
 }
