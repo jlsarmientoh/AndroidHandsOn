@@ -3,19 +3,19 @@ package com.globant.mobile.handson;
 import java.io.File;
 import java.util.zip.Inflater;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +30,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.ShareActionProvider;
 
 import com.globant.mobile.handson.media.BitmapCache.ImageCacheParams;
 import com.globant.mobile.handson.media.BitmapFetcher;
@@ -54,6 +54,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 	 private BitmapFetcher mImageFetcher;
 	 private Inflater mInflater;
 	 private ActionMode mActionMode;
+	 private ShareActionProvider mShareActionProvider;
 
 	
     public ImageGrid() {}
@@ -202,14 +203,24 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 					
 				}
 				
+				@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 				@Override
 				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 					// Inflate a menu resource providing context menu items
 			        MenuInflater inflater = mode.getMenuInflater();
 			        inflater.inflate(R.menu.image_context_bar, menu);
+			        
+			        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+				        //Locate MenuItem with ShareActionProvider
+				        MenuItem item = menu.findItem(R.id.action_share);
+				        //Fetch and store ShareActionProvider
+				        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+				        mShareActionProvider.setShareIntent(getShareIntent(index));
+			        }
 			        return true;
 				}
 				
+				@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 				@Override
 				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 					switch(item.getItemId()){
@@ -217,7 +228,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 						deleteBitmap(index);
 						mode.finish(); // Action picked, so close the CAB
 						return true;
-						}
+					}
 					default:
 						return false;
 					}
@@ -226,7 +237,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
         	
         	mActionMode = this.getActivity().startActionMode(mActionModeCallback);
         	v.setSelected(true);
-        	v.setPressed(true);
+        	v.setPressed(true);        	
         	return true;
         }else{
         	return false;
@@ -275,6 +286,20 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
     		fileToDelete.delete();
     		mAdapter.notifyDataSetChanged();
     	}
+	}
+    
+    private Intent getShareIntent(int position) {
+    	final GridView mGridView = (GridView)this.getActivity().findViewById(R.id.gridView);
+    	String bitmapPath = (String)mGridView.getAdapter().getItem(position);    	
+    	//Create the intent
+    	Intent shareIntent = new Intent();
+    	shareIntent.setAction(Intent.ACTION_SEND);
+    	shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(bitmapPath));		
+    	shareIntent.setType("image/jpeg");
+    	
+    	startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.action_share)));
+    	
+    	return shareIntent;
 	}
 	/**
      * The main adapter that backs the GridView. This is fairly standard except the number of
