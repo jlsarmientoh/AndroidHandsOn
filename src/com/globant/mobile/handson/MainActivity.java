@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity {
 	 * @param view
 	 */
 	public void sendMessage(View view){
-		String message = null;
+		/*String message = null;
 		
 		Intent intent = new Intent(this, DisplayMessageActivity.class);
 		
@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity {
 		message = editText.getText().toString();
 		intent.putExtra(EXTRA_MESSAGE, message);
 		
-		startActivity(intent);
+		startActivity(intent);*/
 	}	
 	/**
 	 * Opens the Custom Camera activity 

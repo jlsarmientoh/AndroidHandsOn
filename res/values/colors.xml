@@ -3,5 +3,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="grid_state_pressed">#BB7dbcd3</color>
     <color name="grid_state_focused">#777dbcd3</color>
-
+    <color name="main_activity_background">#666666</color>
+    
 </resources>

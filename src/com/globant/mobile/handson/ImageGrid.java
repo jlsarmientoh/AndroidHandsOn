@@ -271,7 +271,8 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
             case R.id.action_delete:
                 deleteBitmap(info.position, (int)info.id);            	
                 return true;
-            case R.id.action_share:                
+            case R.id.action_share:
+            	getShareIntent(info.position);
                 return true;
             default:
                 return super.onContextItemSelected(item);

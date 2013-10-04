@@ -19,5 +19,6 @@
     <string name="title_activity_gallery">Galería</string>    
     <string name="imageview_description">Miniatura</string>
     <string name="title_activity_image_detail">Detalle</string>
+    <string name="select">Seleccione</string>
     
 </resources>
