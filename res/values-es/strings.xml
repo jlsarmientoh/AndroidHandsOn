@@ -5,6 +5,7 @@
     <string name="action_search">Buscar</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_share">Compartir</string>
+    <string name="action_mustache">Bigote</string>
     <string name="edit_message">Ingrese una mensaje</string>
     <string name="button_send">Enviar</string>
     <string name="button_camera">Tomar foto</string>

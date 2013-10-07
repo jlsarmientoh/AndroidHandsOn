@@ -6,6 +6,7 @@
     <string name="action_search">Search</string>
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
+    <string name="action_mustache">Mustache</string>
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
     <string name="button_camera">Take a picture</string>

@@ -26,6 +26,7 @@ import android.widget.ImageView;
 
 import com.globant.mobile.handson.BuildConfig;
 import com.globant.mobile.handson.media.BitmapCache;
+import com.globant.mobile.handson.media.FaceDetection;
 import com.globant.mobile.handson.media.RecyclingBitmapDrawable;
 
 public abstract class BitmapWorker {
@@ -277,11 +278,11 @@ public abstract class BitmapWorker {
             if (bitmap != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     // Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-                    drawable = new BitmapDrawable(mResources, detectFaces(bitmap));
+                    drawable = new BitmapDrawable(mResources, FaceDetection.detectFaces(bitmap));
                 } else {
                     // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable
                     // which will recycle automagically
-                    drawable = new RecyclingBitmapDrawable(mResources, detectFaces(bitmap));
+                    drawable = new RecyclingBitmapDrawable(mResources, FaceDetection.detectFaces(bitmap));
                 }
 
                 if (mImageCache != null) {
@@ -340,7 +341,7 @@ public abstract class BitmapWorker {
             return null;
         }
         
-        private Bitmap detectFaces(Bitmap bitmap){
+        /*private Bitmap detectFaces(Bitmap bitmap){
         	//Face Detection
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
@@ -383,7 +384,7 @@ public abstract class BitmapWorker {
             }else{
             	return bitmap;
             }
-        }
+        }*/
     }
 
     /**

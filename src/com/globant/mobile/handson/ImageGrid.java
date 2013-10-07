@@ -51,8 +51,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 	 private int mImageThumbSize;
 	 private int mImageThumbSpacing;
 	 private ImageAdapter mAdapter;
-	 private BitmapFetcher mImageFetcher;
-	 private Inflater mInflater;
+	 private BitmapFetcher mImageFetcher;	 
 	 private ActionMode mActionMode;	 
 
 	
@@ -84,8 +83,8 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 
         final View v = inflater.inflate(R.layout.fragment_image_grid, container, false);
         final GridView mGridView = (GridView) v.findViewById(R.id.gridView);
-        mGridView.setAdapter(mAdapter);        
-        mGridView.setOnItemLongClickListener(this);
+        mGridView.setAdapter(mAdapter);
+        mGridView.setOnItemClickListener(this);        
         mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
@@ -106,7 +105,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
         	registerForContextMenu(mGridView);
         }else{
-        	mGridView.setOnItemClickListener(this);
+        	mGridView.setOnItemLongClickListener(this);
         }
         // This listener is used to get the final width of the GridView and then calculate the
         // number of columns and the width of each column. The width of each column is variable
