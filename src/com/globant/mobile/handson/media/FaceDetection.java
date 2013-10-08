@@ -101,7 +101,7 @@ public class FaceDetection {
         		
         		canvas.drawBitmap(mustache, 
         				(int)midPoint.x - (int)(mustache.getWidth() / 2), 
-        				(int)midPoint.y - (int)(eyeDistance / 4), 
+        				(int)midPoint.y + (int)(eyeDistance / 2), 
         				null);
         	}
         	
@@ -117,7 +117,7 @@ public class FaceDetection {
 		String bitmapName = null;
 		InputStream is = null;
 		
-		if(eyeDistance > 1.0f && eyeDistance <= 26f){
+		if(eyeDistance > 0.0f && eyeDistance <= 26f){
 			bitmapName = "mustache_26.png";
 		}
 		else if(eyeDistance > 26f && eyeDistance <= 32f){
