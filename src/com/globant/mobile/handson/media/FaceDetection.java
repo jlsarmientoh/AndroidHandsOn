@@ -9,15 +9,16 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.drawable.Drawable;
 import android.media.FaceDetector;
 import android.media.FaceDetector.Face;
 import android.util.Log;
 
 public class FaceDetection {
 	
+	private static final String ASSET = "mustache_256.png";
 	private static final String TAG = "FaceDetection";
 
 
@@ -44,14 +45,12 @@ public class FaceDetection {
         
         int facesFound = detector.findFaces(bitmap565, faces);
         PointF midPoint = new PointF();
-        float eyeDistance = 0.0f;
-        float confidence = 0.0f;
+        float eyeDistance = 0.0f;        
         
         if(facesFound > 0){
         	for(int i = 0; i < facesFound; i++){
         		faces[i].getMidPoint(midPoint);
         		eyeDistance = faces[i].eyesDistance();
-        		confidence = faces[i].confidence();
         		
         		canvas.drawRect((int)midPoint.x - eyeDistance, 
         				(int)midPoint.y - eyeDistance,
@@ -79,9 +78,9 @@ public class FaceDetection {
         Paint drawPaint = new Paint();
         
         ditherPaint.setDither(true);
-        drawPaint.setColor(Color.YELLOW);
+        /*drawPaint.setColor(Color.YELLOW);
         drawPaint.setStyle(Paint.Style.STROKE);
-        drawPaint.setStrokeWidth(2);
+        drawPaint.setStrokeWidth(2);*/
         
         Canvas canvas = new Canvas();
         canvas.setBitmap(bitmap565);
@@ -89,19 +88,17 @@ public class FaceDetection {
         
         int facesFound = detector.findFaces(bitmap565, faces);
         PointF midPoint = new PointF();
-        float eyeDistance = 0.0f;
-        float confidence = 0.0f;
+        float eyeDistance = 0.0f;        
         
         if(facesFound > 0){
         	for(int i = 0; i < facesFound; i++){
         		faces[i].getMidPoint(midPoint);
-        		eyeDistance = faces[i].eyesDistance();
-        		confidence = faces[i].confidence();
+        		eyeDistance = faces[i].eyesDistance();        		
         		Bitmap mustache = loadMustacheBitmap(eyeDistance, manager);
         		
         		canvas.drawBitmap(mustache, 
         				(int)midPoint.x - (int)(mustache.getWidth() / 2), 
-        				(int)midPoint.y + (int)(eyeDistance / 2), 
+        				(int)midPoint.y + (int)(eyeDistance / 4), 
         				null);
         	}
         	
@@ -113,29 +110,23 @@ public class FaceDetection {
 	}
 	
 	private Bitmap loadMustacheBitmap(float eyeDistance, AssetManager manager){
-		Bitmap mustache = null;
-		String bitmapName = null;
+		Bitmap mustache = null;		
 		InputStream is = null;
 		
-		if(eyeDistance > 0.0f && eyeDistance <= 26f){
-			bitmapName = "mustache_26.png";
-		}
-		else if(eyeDistance > 26f && eyeDistance <= 32f){
-			bitmapName = "mustache_32.png";
-		}
-		else if(eyeDistance > 32f && eyeDistance <= 48f){
-			bitmapName = "mustache_48.png";
-		}
-		else if(eyeDistance > 48f && eyeDistance <= 64f){
-			bitmapName = "mustache_64.png";
-		}
-		else if(eyeDistance > 64f){
-			bitmapName = "mustache_256.png";
-		}
-		
 		try{
-			is = manager.open(bitmapName);
-			mustache = BitmapFactory.decodeStream(is);
+			is = manager.open(ASSET);
+			Bitmap assetMustache = BitmapFactory.decodeStream(is);
+			//Scale the mustache from eye distance, it will have the same width
+			int width = assetMustache.getWidth();
+			int height = assetMustache.getHeight();
+			float scaleWidth = eyeDistance / (float)width;
+			float scaleHeight = eyeDistance / (float)height;
+			//create a Matrix for the manipulation
+			Matrix matrix = new Matrix();
+			//Resize the bitmap
+			matrix.postScale(scaleWidth, scaleHeight);
+			//Recreate the new bitmap
+			mustache = Bitmap.createBitmap(assetMustache, 0, 0, width, height, matrix, false);
 		}catch(IOException e){
 			Log.e(TAG, e.getMessage(), e);
 		}finally{

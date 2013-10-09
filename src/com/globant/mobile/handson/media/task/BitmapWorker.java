@@ -2,22 +2,16 @@ package com.globant.mobile.handson.media.task;
 
 import java.lang.ref.WeakReference;
 
+import android.content.res.AssetManager;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
-import android.media.FaceDetector;
-import android.media.FaceDetector.Face;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +30,7 @@ public abstract class BitmapWorker {
     private BitmapCache mImageCache;
     private BitmapCache.ImageCacheParams mImageCacheParams;
     private Bitmap mLoadingBitmap;
+    private FaceDetection mFaceDetection;
     private boolean mFadeInBitmap = true;
     private boolean mExitTasksEarly = false;
     protected boolean mPauseWork = false;
@@ -50,6 +45,7 @@ public abstract class BitmapWorker {
 
     protected BitmapWorker(Context context) {
         mResources = context.getResources();
+        mFaceDetection = new FaceDetection();
     }
 
     /**
@@ -62,8 +58,11 @@ public abstract class BitmapWorker {
      *
      * @param data The URL of the image to download.
      * @param imageView The ImageView to bind the downloaded image to.
+     * @param includeMustache Boolean Object.  If true, it will include a mustache to the faces detected in the picture;
+     * If false, it only will mark off with a square the faces detected in the picture.
+     * @param manager AssetManager Object,  Mandatory only if includeMustache is true; Otherwise can be null.
      */
-    public void loadImage(Object data, ImageView imageView) {
+    public void loadImage(Object data, ImageView imageView, Object includeMustache, Object manager) {    	
         if (data == null) {
             return;
         }
@@ -74,7 +73,7 @@ public abstract class BitmapWorker {
             value = mImageCache.getBitmapFromMemCache(String.valueOf(data));
         }
 
-        if (value != null) {
+        if (value != null && !Boolean.parseBoolean(String.valueOf(includeMustache))) {
             // Bitmap found in memory cache
             imageView.setImageDrawable(value);
         } else if (cancelPotentialWork(data, imageView)) {
@@ -86,7 +85,7 @@ public abstract class BitmapWorker {
             // NOTE: This uses a custom version of AsyncTask that has been pulled from the
             // framework and slightly modified. Refer to the docs at the top of the class
             // for more info on what was changed.
-            task.executeOnExecutor(AsyncTask.DUAL_THREAD_EXECUTOR, data);
+            task.executeOnExecutor(AsyncTask.DUAL_THREAD_EXECUTOR, data, includeMustache, manager);
         }
     }
 
@@ -224,6 +223,8 @@ public abstract class BitmapWorker {
      */
     private class BitmapWorkerTask extends AsyncTask<Object, Void, BitmapDrawable> {
         private Object data;
+        private boolean includeMustache;
+        private AssetManager manager;
         private final WeakReference<ImageView> imageViewReference;
 
         public BitmapWorkerTask(ImageView imageView) {
@@ -240,6 +241,10 @@ public abstract class BitmapWorker {
             }
 
             data = params[0];
+            includeMustache = Boolean.parseBoolean(String.valueOf(params[1]));
+            if(includeMustache && (params[2] instanceof AssetManager)){
+            	manager = (AssetManager)params[2];
+            }
             final String dataString = String.valueOf(data);
             Bitmap bitmap = null;
             BitmapDrawable drawable = null;
@@ -278,11 +283,19 @@ public abstract class BitmapWorker {
             if (bitmap != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     // Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-                    drawable = new BitmapDrawable(mResources, FaceDetection.detectFaces(bitmap));
+                	if(includeMustache){
+                		drawable = new BitmapDrawable(mResources, mFaceDetection.putMustache(bitmap, manager));
+                	}else{
+                		drawable = new BitmapDrawable(mResources, /*FaceDetection.detectFaces(*/bitmap/*)*/);
+                	}
                 } else {
                     // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable
                     // which will recycle automagically
-                    drawable = new RecyclingBitmapDrawable(mResources, FaceDetection.detectFaces(bitmap));
+                	if(includeMustache){
+                		drawable = new RecyclingBitmapDrawable(mResources, mFaceDetection.putMustache(bitmap, manager));
+                	}else{
+                		drawable = new RecyclingBitmapDrawable(mResources, /*FaceDetection.detectFaces(*/bitmap/*)*/);
+                	}
                 }
 
                 if (mImageCache != null) {
@@ -340,51 +353,6 @@ public abstract class BitmapWorker {
 
             return null;
         }
-        
-        /*private Bitmap detectFaces(Bitmap bitmap){
-        	//Face Detection
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            
-            FaceDetector detector = new FaceDetector(width, height, 5);
-            Face[] faces = new Face[5];
-            
-            Bitmap bitmap565 = Bitmap.createBitmap(width, height, Config.RGB_565);
-            Paint ditherPaint = new Paint();
-            Paint drawPaint = new Paint();
-            
-            ditherPaint.setDither(true);
-            drawPaint.setColor(Color.YELLOW);
-            drawPaint.setStyle(Paint.Style.STROKE);
-            drawPaint.setStrokeWidth(2);
-            
-            Canvas canvas = new Canvas();
-            canvas.setBitmap(bitmap565);
-            canvas.drawBitmap(bitmap, 0, 0, ditherPaint);
-            
-            int facesFound = detector.findFaces(bitmap565, faces);
-            PointF midPoint = new PointF();
-            float eyeDistance = 0.0f;
-            float confidence = 0.0f;
-            
-            if(facesFound > 0){
-            	for(int i = 0; i < facesFound; i++){
-            		faces[i].getMidPoint(midPoint);
-            		eyeDistance = faces[i].eyesDistance();
-            		confidence = faces[i].confidence();
-            		
-            		canvas.drawRect((int)midPoint.x - eyeDistance, 
-            				(int)midPoint.y - eyeDistance,
-            				(int)midPoint.x + eyeDistance,
-            				(int)midPoint.y + eyeDistance, drawPaint);
-            	}
-            	
-            	//return the bitmap with the marked faces
-            	return bitmap565;
-            }else{
-            	return bitmap;
-            }
-        }*/
     }
 
     /**

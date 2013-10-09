@@ -43,7 +43,8 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
     private BitmapFetcher mImageFetcher;
     private ActionMode mActionMode;
     private FaceDetection mFaceDetection;
-    private File storageDir;
+    private File storageDir;  
+    private boolean modified = false;
     /**
 	 * Static attributes
 	 */
@@ -88,6 +89,7 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
         // Inflate and locate the main ImageView
         final View v = inflater.inflate(R.layout.fragment_image_detail, container, false);
         mImageView = (ImageView) v.findViewById(R.id.pictureFrame);
+        mImageView.setDrawingCacheEnabled(true);
         mFaceDetection = new FaceDetection();
       //Setting the Context Menu for the GridVew id API level is lower than Honeycomb
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
@@ -107,7 +109,7 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
         // cache can be used over all pages in the ViewPager
         if (ImageDetailActivity.class.isInstance(getActivity())) {
             mImageFetcher = ((ImageDetailActivity) getActivity()).getImageFetcher();
-            mImageFetcher.loadImage(mImageUrl, mImageView);
+            mImageFetcher.loadImage(mImageUrl, mImageView, "false", null);
         }
 
         // Pass clicks on the ImageView to the parent activity to handle
@@ -122,6 +124,15 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
     	
     	MenuInflater inflater = this.getActivity().getMenuInflater();
     	inflater.inflate(R.menu.image_detail, menu);
+    }
+    
+    @Override
+    public void onPause(){
+    	if(modified){
+    		savePicture();
+    		modified = false;
+    	}
+    	super.onPause();
     }
 
     @Override
@@ -173,33 +184,19 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
 				@Override
 				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 					switch(item.getItemId()){
-					case R.id.action_mustache:{						
-						mode.finish(); // Action picked, so close the CAB
-						Bitmap b = BitmapFactory.decodeFile(mImageUrl);
-						Bitmap mustachedBitmap = mFaceDetection.putMustache(b, manager);
-						mImageView.setImageBitmap(mustachedBitmap);
-						File pictureFile;
-						try {
-							pictureFile = createImageFile(MEDIA_TYPE_IMAGE);
-						} catch (IOException e) {
-							Log.d("HandsOn", "Error creating media file, check storage permissions");
-							e.printStackTrace();
-							return false;
-						}
-						
-						try{
-							FileOutputStream fos = new FileOutputStream(pictureFile);
-							mustachedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-							fos.close();
-							mImageUrl = pictureFile.getAbsolutePath();
-						} catch(FileNotFoundException e){
-							Log.d("HandsOn", "File not found: " + e.getMessage());
-						} catch(Exception e){
-							Log.d("HandsOn", "Erroe accesing file: " + e.getMessage());
-						}
+					case R.id.action_mustache:{	
+						mImageFetcher.loadImage(mImageUrl, mImageView, "true", manager);
+						modified = true;
+						mode.finish(); // Action picked, so close the CAB						
 						return true;
 					}
 					case R.id.action_share:{
+						//Saves the modified picture before share it
+						if(modified){
+							savePicture();
+							modified = false;
+						}
+						//Share
 						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
 					        getShareIntent(mImageUrl);
 				        }
@@ -278,6 +275,26 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
 		}else{
 			//External storage not available/mounted/etc
 			throw new IOException("External memory not available");
+		}
+	}
+	
+	private void savePicture(){	
+		Bitmap mustachedBitmap = mImageView.getDrawingCache(true);
+		File pictureFile = null;
+		try {
+			pictureFile = createImageFile(MEDIA_TYPE_IMAGE);
+			
+			FileOutputStream fos = new FileOutputStream(pictureFile);
+			mustachedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+			fos.close();
+			mImageUrl = pictureFile.getAbsolutePath();
+		} catch(FileNotFoundException e){
+			Log.d("HandsOn", "File not found: " + e.getMessage());
+		} catch (IOException e) {
+			Log.d("HandsOn", "Error creating media file, check storage permissions");
+			e.printStackTrace();
+		} catch(Exception e){
+			Log.d("HandsOn", "Erroe accesing file: " + e.getMessage());
 		}
 	}
 	

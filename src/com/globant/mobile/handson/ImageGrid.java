@@ -390,7 +390,7 @@ public class ImageGrid extends Fragment implements AdapterView.OnItemClickListen
 
             // Finally load the image asynchronously into the ImageView, this also takes care of
             // setting a placeholder image while the background thread runs
-            mImageFetcher.loadImage(Bitmaps.imageThumbUrls[position - mNumColumns], imageView);
+            mImageFetcher.loadImage(Bitmaps.imageThumbUrls[position - mNumColumns], imageView, "false", null);
             return imageView;
         }
 

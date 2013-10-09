@@ -198,28 +198,4 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
             mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
-    
-    /*@TargetApi(11)
-    public static void enableStrictMode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            StrictMode.ThreadPolicy.Builder threadPolicyBuilder =
-                    new StrictMode.ThreadPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog();
-            StrictMode.VmPolicy.Builder vmPolicyBuilder =
-                    new StrictMode.VmPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog();
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                threadPolicyBuilder.penaltyFlashScreen();
-                vmPolicyBuilder
-                        .setClassInstanceLimit(ImageGrid.class, 1)
-                        .setClassInstanceLimit(ImageDetailActivity.class, 1);
-            }
-            StrictMode.setThreadPolicy(threadPolicyBuilder.build());
-            StrictMode.setVmPolicy(vmPolicyBuilder.build());
-        }
-    }*/
-
 }
