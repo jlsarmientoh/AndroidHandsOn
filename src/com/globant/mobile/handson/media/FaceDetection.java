@@ -98,7 +98,7 @@ public class FaceDetection {
         		
         		canvas.drawBitmap(mustache, 
         				(int)midPoint.x - (int)(mustache.getWidth() / 2), 
-        				(int)midPoint.y + (int)(eyeDistance / 4), 
+        				(int)midPoint.y + (int)(eyeDistance / 3), 
         				null);
         	}
         	

@@ -12,11 +12,11 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.ActionMode;
@@ -218,10 +218,10 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
 	}
 
 	private void getShareIntent(String bitmapPath) {    	    	
-    	//Create the intent
+    	//Create the intent				
     	Intent shareIntent = new Intent();
     	shareIntent.setAction(Intent.ACTION_SEND);
-    	shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(bitmapPath));		
+    	shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(bitmapPath)));		
     	shareIntent.setType("image/jpeg");
     	
     	startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.action_share)));
