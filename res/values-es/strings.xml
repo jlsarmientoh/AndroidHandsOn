@@ -6,6 +6,7 @@
     <string name="action_delete">Eliminar</string>
     <string name="action_share">Compartir</string>
     <string name="action_mustache">Bigote</string>
+    <string name="action_save">Guardar</string>
     <string name="edit_message">Ingrese una mensaje</string>
     <string name="button_send">Enviar</string>
     <string name="button_camera">Tomar foto</string>
@@ -21,5 +22,5 @@
     <string name="imageview_description">Miniatura</string>
     <string name="title_activity_image_detail">Detalle</string>
     <string name="select">Seleccione</string>
-    
+    <string name="savingMessage">Guardando cambios. . .</string>
 </resources>

@@ -241,7 +241,7 @@ public class BitmapFetcher extends BitmapDecoder {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data) {
+    public Bitmap processBitmap(Object data) {
         return processBitmap(String.valueOf(data));
     }
 

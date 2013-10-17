@@ -4,6 +4,11 @@
         android:id="@+id/action_mustache"        
         android:showAsAction="always"
         android:title="@string/action_mustache"/>
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="always"
+        android:title="@string/action_save" />
     
     <item
         android:id="@+id/action_share"

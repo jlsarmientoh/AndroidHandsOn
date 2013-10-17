@@ -1,24 +1,16 @@
 package com.globant.mobile.handson;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -32,25 +24,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.globant.mobile.handson.media.BitmapFetcher;
-import com.globant.mobile.handson.media.FaceDetection;
 import com.globant.mobile.handson.media.task.BitmapWorker;
+import com.globant.mobile.handson.media.task.MustacheWorker;
+import com.globant.mobile.handson.media.task.WorkerListener;
 
-public class ImageDetailFragment extends Fragment implements View.OnLongClickListener {
+public class ImageDetailFragment extends Fragment implements View.OnLongClickListener, WorkerListener<String> {
 
 	private static final String IMAGE_DATA_EXTRA = "extra_image_data";
     private String mImageUrl;
     private ImageView mImageView;
     private BitmapFetcher mImageFetcher;
+    private MustacheWorker mMustacheWorker;
     private ActionMode mActionMode;
-    private FaceDetection mFaceDetection;
-    private File storageDir;  
     private boolean modified = false;
-    /**
-	 * Static attributes
-	 */
-	private static final int MEDIA_TYPE_IMAGE = 1;
-	private static final int MEDIA_TYPE_VIDEO = 2;
-	private static final String ALBUM_NAME = "HandsOn";
+    private boolean share = false;
 
     /**
      * Factory method to generate a new instance of the fragment given an image number.
@@ -81,6 +68,9 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mImageUrl = getArguments() != null ? getArguments().getString(IMAGE_DATA_EXTRA) : null;
+        
+        mMustacheWorker = new MustacheWorker(this.getActivity());
+        mMustacheWorker.setWorkerListener(this);
     }
 
     @Override
@@ -89,8 +79,7 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
         // Inflate and locate the main ImageView
         final View v = inflater.inflate(R.layout.fragment_image_detail, container, false);
         mImageView = (ImageView) v.findViewById(R.id.pictureFrame);
-        mImageView.setDrawingCacheEnabled(true);
-        mFaceDetection = new FaceDetection();
+        mImageView.setDrawingCacheEnabled(true);        
       //Setting the Context Menu for the GridVew id API level is lower than Honeycomb
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
         	registerForContextMenu(mImageView);
@@ -127,21 +116,20 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
     }
     
     @Override
-    public void onPause(){
-    	if(modified){
-    		savePicture();
-    		modified = false;
-    	}
+    public void onPause(){    	
     	super.onPause();
     }
 
-    @Override
+	@Override
     public void onDestroy() {
         super.onDestroy();
         if (mImageView != null) {
             // Cancel any pending image work
             BitmapWorker.cancelWork(mImageView);
             mImageView.setImageDrawable(null);
+        }
+        if(mMustacheWorker != null){
+        	mMustacheWorker.unRegisterListener();
         }
     }
 
@@ -154,7 +142,7 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
         		return false;
         	}
         	
-        	final AssetManager manager = this.getActivity().getAssets();
+        	final AssetManager manager = this.getActivity().getAssets();        	 
         	
         	ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 				
@@ -176,7 +164,6 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
 			        MenuInflater inflater = mode.getMenuInflater();
 			        inflater.inflate(R.menu.image_detail, menu);
 			        
-			        
 			        return true;
 				}
 				
@@ -186,20 +173,29 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
 					switch(item.getItemId()){
 					case R.id.action_mustache:{	
 						mImageFetcher.loadImage(mImageUrl, mImageView, "true", manager);
-						modified = true;
+						modified = true;						
 						mode.finish(); // Action picked, so close the CAB						
 						return true;
 					}
 					case R.id.action_share:{
-						//Saves the modified picture before share it
 						if(modified){
-							savePicture();
+							//Saves the modified picture before share it													
+							mMustacheWorker.saveMustachedPicture(mImageUrl);							
 							modified = false;
+							share = true;
+							//Sharing goes after the save mustache finishes see the onTaskCompleted method
+						}else{
+							getShareIntent(mImageUrl);
 						}
-						//Share
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-					        getShareIntent(mImageUrl);
-				        }
+						mode.finish();// Action picked, so close the CAB
+						return true;
+					}
+					case R.id.action_save:{
+						if(modified){							
+							mMustacheWorker.saveMustachedPicture(mImageUrl);							
+							modified = false;
+							share = false;
+						}						
 						mode.finish();// Action picked, so close the CAB
 						return true;
 					}
@@ -226,76 +222,12 @@ public class ImageDetailFragment extends Fragment implements View.OnLongClickLis
     	
     	startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.action_share)));
 	}
-	
-	/**
-	 * Creates the file for the taken image
-	 * @return Image File for storage
-	 * @throws IOException
-	 */
-	@SuppressLint("SimpleDateFormat")
-	private File createImageFile(int type) throws IOException{
-		File image = null;
-		//Get the time stamp for the file's name
-		String imageFileName = null;
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-		
-		if(type == MEDIA_TYPE_IMAGE){
-			//Set the storage directory
-			storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ALBUM_NAME);
-			initStorageDir();
-			//Create and image file name
-			imageFileName = "IMG_" + timeStamp;
-			image = new File(storageDir.getPath() + File.separator + imageFileName + ".jpg");
-		}else if(type == MEDIA_TYPE_VIDEO){
-			//Set the storage directory
-			storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), ALBUM_NAME);
-			initStorageDir();
-			//Create and image file name
-			imageFileName = "VID_" + timeStamp;
-			image = new File(storageDir.getPath() + File.separator + imageFileName + ".mp4");
-		}
-		
-		return image;
-	}
-	
-	
-	
-	private void initStorageDir() throws IOException{		
-		String state = Environment.getExternalStorageState();
-		//Checks if the external storage is mounted
-		if(Environment.MEDIA_MOUNTED.equals(state)){
-			if(!storageDir.exists()){
-				if(!storageDir.mkdirs()){
-					Log.d("HandsOn", "Failed to create directory");
-				}
-			}
-		}else if(Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
-			//External storage mounted but read only, can't write on it
-			throw new IOException("External memory in READ ONLY mode");
-		}else{
-			//External storage not available/mounted/etc
-			throw new IOException("External memory not available");
+
+	@Override
+	public void onTaskCompleted(String result) {
+		this.mImageUrl = result;
+		if(share){
+			getShareIntent(this.mImageUrl);
 		}
 	}
-	
-	private void savePicture(){	
-		Bitmap mustachedBitmap = mImageView.getDrawingCache(true);
-		File pictureFile = null;
-		try {
-			pictureFile = createImageFile(MEDIA_TYPE_IMAGE);
-			
-			FileOutputStream fos = new FileOutputStream(pictureFile);
-			mustachedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-			fos.close();
-			mImageUrl = pictureFile.getAbsolutePath();
-		} catch(FileNotFoundException e){
-			Log.d("HandsOn", "File not found: " + e.getMessage());
-		} catch (IOException e) {
-			Log.d("HandsOn", "Error creating media file, check storage permissions");
-			e.printStackTrace();
-		} catch(Exception e){
-			Log.d("HandsOn", "Erroe accesing file: " + e.getMessage());
-		}
-	}
-	
 }
